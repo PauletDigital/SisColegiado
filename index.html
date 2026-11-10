@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registro de asistencia — Colegiatura</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#F2F5FA;color:#12233F;font:17px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.top{background:#12233F;color:#fff;padding:1rem;border-bottom:5px solid #E8A100}.top small{color:#C9D6EC;display:block;font-size:.8rem}.top b{font-size:1.25rem}
+.w{max-width:520px;margin:0 auto}.card{background:#fff;border:1px solid #CBD5E4;border-radius:12px;padding:1.1rem;margin:1rem}
+label{display:block;font-weight:600;margin:.8rem 0 .3rem}label:first-child{margin-top:0}
+input,textarea{width:100%;padding:.75rem;font:inherit;color:#12233F;background:#F2F5FA;border:1px solid #CBD5E4;border-radius:8px}
+#cod{text-transform:uppercase;letter-spacing:.2em;font-weight:700;text-align:center}
+button{width:100%;margin-top:1rem;padding:.85rem;border:0;border-radius:8px;background:#E8A100;color:#12233F;font:700 1rem inherit;cursor:pointer}
+button.s{background:transparent;border:1px solid #CBD5E4;color:#12233F}button:disabled{opacity:.5}
+.m{padding:.8rem 1rem;border-left:6px solid #A12B2B;border-radius:6px;margin-top:.9rem;color:#A12B2B;background:#fdf1f1}.m.ok{border-color:#17663A;color:#17663A;background:#eef8f1}
+.pie{text-align:center;color:#4C5B73;font-size:.78rem;padding:0 1rem 1.2rem}.hidden{display:none!important}
+</style></head><body>
+<div class="top"><div class="w"><small>I.E.E. Pedro E. Paulet - Huacho (MSE-SFT) ::: Área Técnica</small><b>Registro de asistencia a la colegiatura</b></div></div>
+<div class="w"><div class="card">
+ <div id="p1">
+  <p style="margin-top:0">Registra tu asistencia en los <b>últimos minutos</b> de la colegiatura, con el código que muestra tu jefe de taller.</p>
+  <label for="cod">Código de la sesión</label><input id="cod" maxlength="6" autocomplete="off" autocapitalize="characters">
+  <label for="dni">Tu DNI</label><input id="dni" inputmode="numeric" maxlength="8" autocomplete="off">
+  <button id="b1">Continuar</button>
+ </div>
+ <div id="p2" class="hidden">
+  <p style="margin-top:0">Registrarás la asistencia de <b id="nom"></b><br><small id="det"></small></p>
+  <label for="tema">Tema tratado o tu aporte</label>
+  <textarea id="tema" rows="4" maxlength="500" placeholder="Escribe con tus palabras lo trabajado en la colegiatura"></textarea>
+  <button id="b2">Confirmar y registrar</button><button id="atras" class="s">No soy yo</button>
+ </div>
+ <div id="p3" class="hidden"><div class="m ok"><b>Asistencia registrada</b><div id="fin"></div></div></div>
+ <div id="msg" class="m hidden" role="alert"></div>
+</div></div>
+<div class="pie">I.E.E. Pedro E. Paulet - Huacho (MSE-SFT) ::: Área Técnica &nbsp;·&nbsp; Desarrollado por: @hiamet</div>
+<script>
+/* ===== CONFIGURA ESTA LÍNEA: URL de la publicación "Docentes" de Apps Script (termina en /exec) ===== */
+const API='PEGA_AQUI_LA_URL_DE_DOCENTES';
+const $=id=>document.getElementById(id);
+const Q=(new URLSearchParams(location.search).get('s')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+if(Q){$('cod').value=Q;$('dni').focus();}
+async function post(o){const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)});return r.json();}
+function err(t){$('msg').textContent=t;$('msg').classList.toggle('hidden',!t);}
+$('dni').addEventListener('input',e=>e.target.value=e.target.value.replace(/\D/g,''));
+$('cod').addEventListener('input',e=>e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,''));
+$('b1').onclick=async()=>{
+  err('');const c=$('cod').value.trim(),dni=$('dni').value.trim();
+  if(c.length<6)return err('Escribe el código de 6 caracteres que muestra tu jefe de taller.');
+  if(!/^\d{8}$/.test(dni))return err('El DNI debe tener 8 dígitos.');
+  $('b1').disabled=true;
+  try{const r=await post({accion:'buscar',c,dni});if(!r.ok)err(r.error);else{$('nom').textContent=r.nombre;$('det').textContent='Colegiatura de '+r.jefe+' · Grupo '+r.grupo;$('p1').classList.add('hidden');$('p2').classList.remove('hidden');}}
+  catch(e){err('No se pudo conectar. Revisa tu internet e intenta de nuevo.');}
+  $('b1').disabled=false;
+};
+$('atras').onclick=()=>{err('');$('p2').classList.add('hidden');$('p1').classList.remove('hidden');};
+$('b2').onclick=async()=>{
+  err('');$('b2').disabled=true;
+  try{const r=await post({accion:'marcar',c:$('cod').value.trim(),dni:$('dni').value.trim(),tema:$('tema').value});
+    if(!r.ok)err(r.error);else{$('p2').classList.add('hidden');$('p3').classList.remove('hidden');$('fin').textContent=r.nombre+' · '+r.hora;}}
+  catch(e){err('No se pudo conectar. Revisa tu internet e intenta de nuevo.');}
+  $('b2').disabled=false;
+};
+</script></body></html>
