@@ -33,11 +33,21 @@ button.s{background:transparent;border:1px solid #CBD5E4;color:#12233F}button:di
 <div class="pie">I.E.E. Pedro E. Paulet - Huacho (MSE-SFT) ::: Área Técnica &nbsp;·&nbsp; Desarrollado por: @hiamet</div>
 <script>
 /* ===== CONFIGURA ESTA LÍNEA: URL de la publicación "Docentes" de Apps Script (termina en /exec) ===== */
-const API='https://script.google.com/macros/s/AKfycbzAVp2fWSYeSJli2FVvC2-zBvBlfVcO6STr7RK0Iy8q94Yv6wWHSJZftJeF65FCBAec/exec';
+const API='https://script.google.com/macros/s/AKfycbyL9CGu9zwSJY7sqmvOJT1LQ3SfKA5SPNFrWfcux8MeIQ-_1uCwKZdTeO9KaAvvaxPA/exec';
 const $=id=>document.getElementById(id);
 const Q=(new URLSearchParams(location.search).get('s')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
 if(Q){$('cod').value=Q;$('dni').focus();}
-async function post(o){const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)});return r.json();}
+async function post(o){
+  if(/^PEGA_AQUI/.test(API))throw new Error('config');
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)});
+  const t=await r.text();
+  try{return JSON.parse(t);}catch(x){throw new Error('respuesta');}
+}
+function fallo(e){
+  err(e&&e.message==='config'?'La página aún no tiene configurada la dirección del sistema. Avisa al administrador. (código: A)'
+    :e&&e.message==='respuesta'?'El sistema respondió algo inesperado. Avisa al administrador: debe revisar la publicación de Docentes. (código: B)'
+    :'No se pudo conectar con el sistema. Revisa tu internet; si persiste, avisa al administrador. (código: C)');
+}
 function err(t){$('msg').textContent=t;$('msg').classList.toggle('hidden',!t);}
 $('dni').addEventListener('input',e=>e.target.value=e.target.value.replace(/\D/g,''));
 $('cod').addEventListener('input',e=>e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,''));
@@ -47,7 +57,7 @@ $('b1').onclick=async()=>{
   if(!/^\d{8}$/.test(dni))return err('El DNI debe tener 8 dígitos.');
   $('b1').disabled=true;
   try{const r=await post({accion:'buscar',c,dni});if(!r.ok)err(r.error);else{$('nom').textContent=r.nombre;$('det').textContent='Colegiatura de '+r.jefe+' · Grupo '+r.grupo;$('p1').classList.add('hidden');$('p2').classList.remove('hidden');}}
-  catch(e){err('No se pudo conectar. Revisa tu internet e intenta de nuevo.');}
+  catch(e){fallo(e);}
   $('b1').disabled=false;
 };
 $('atras').onclick=()=>{err('');$('p2').classList.add('hidden');$('p1').classList.remove('hidden');};
@@ -55,7 +65,7 @@ $('b2').onclick=async()=>{
   err('');$('b2').disabled=true;
   try{const r=await post({accion:'marcar',c:$('cod').value.trim(),dni:$('dni').value.trim(),tema:$('tema').value});
     if(!r.ok)err(r.error);else{$('p2').classList.add('hidden');$('p3').classList.remove('hidden');$('fin').textContent=r.nombre+' · '+r.hora;}}
-  catch(e){err('No se pudo conectar. Revisa tu internet e intenta de nuevo.');}
+  catch(e){fallo(e);}
   $('b2').disabled=false;
 };
 </script></body></html>
