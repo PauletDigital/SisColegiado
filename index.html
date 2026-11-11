@@ -1,71 +1,125 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
 <title>Registro de asistencia — Colegiatura</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#F2F5FA;color:#12233F;font:17px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
-.top{background:#12233F;color:#fff;padding:1rem;border-bottom:5px solid #E8A100}.top small{color:#C9D6EC;display:block;font-size:.8rem}.top b{font-size:1.25rem}
-.w{max-width:520px;margin:0 auto}.card{background:#fff;border:1px solid #CBD5E4;border-radius:12px;padding:1.1rem;margin:1rem}
-label{display:block;font-weight:600;margin:.8rem 0 .3rem}label:first-child{margin-top:0}
+.top{background:#12233F;color:#fff;padding:1rem;border-bottom:5px solid #E8A100}
+.w{max-width:520px;margin:0 auto}.top .w{padding:0}
+.top small{color:#C9D6EC;display:block;font-size:.8rem}.top b{font-size:1.3rem;display:block}.top span{color:#C9D6EC;font-size:.95rem}
+.card{background:#fff;border:1px solid #CBD5E4;border-radius:12px;padding:1.1rem;margin:1rem}
+label{display:block;font-weight:600;margin:.9rem 0 .3rem}label:first-child{margin-top:0}
 input,textarea{width:100%;padding:.75rem;font:inherit;color:#12233F;background:#F2F5FA;border:1px solid #CBD5E4;border-radius:8px}
-#cod{text-transform:uppercase;letter-spacing:.2em;font-weight:700;text-align:center}
+input:focus,textarea:focus,button:focus-visible{outline:3px solid #0F7B8A;outline-offset:1px}
+#cod{text-transform:uppercase;letter-spacing:.25em;font-weight:700;text-align:center}
 button{width:100%;margin-top:1rem;padding:.85rem;border:0;border-radius:8px;background:#E8A100;color:#12233F;font:700 1rem inherit;cursor:pointer}
-button.s{background:transparent;border:1px solid #CBD5E4;color:#12233F}button:disabled{opacity:.5}
-.m{padding:.8rem 1rem;border-left:6px solid #A12B2B;border-radius:6px;margin-top:.9rem;color:#A12B2B;background:#fdf1f1}.m.ok{border-color:#17663A;color:#17663A;background:#eef8f1}
-.pie{text-align:center;color:#4C5B73;font-size:.78rem;padding:0 1rem 1.2rem}.hidden{display:none!important}
-</style></head><body>
-<div class="top"><div class="w"><small>I.E.E. Pedro E. Paulet - Huacho (MSE-SFT) ::: Área Técnica</small><b>Registro de asistencia a la colegiatura</b></div></div>
-<div class="w"><div class="card">
- <div id="p1">
-  <p style="margin-top:0">Registra tu asistencia en los <b>últimos minutos</b> de la colegiatura, con el código que muestra tu jefe de taller.</p>
-  <label for="cod">Código de la sesión</label><input id="cod" maxlength="6" autocomplete="off" autocapitalize="characters">
-  <label for="dni">Tu DNI</label><input id="dni" inputmode="numeric" maxlength="8" autocomplete="off">
-  <button id="b1">Continuar</button>
+button.s{background:transparent;border:1px solid #CBD5E4;color:#12233F}button:disabled{opacity:.5;cursor:not-allowed}
+.m{padding:.8rem 1rem;border-left:6px solid #A12B2B;border-radius:6px;margin-top:.9rem;color:#A12B2B;background:#fdf1f1}
+.m.ok{border-color:#17663A;color:#17663A;background:#eef8f1}.m.av{border-color:#8A5A00;color:#6b4600;background:#fff8e6}
+.pie{text-align:center;color:#4C5B73;font-size:.78rem;padding:0 1rem 1.5rem}.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="top"><div class="w"><small>I.E.E. Pedro E. Paulet - Huacho (MSE-SFT) ::: Área Técnica</small><b>Registro de asistencia</b><span id="sub">Colegiatura</span></div></div>
+<div class="w">
+ <div class="card">
+  <div id="p1">
+   <p style="margin-top:0">Registra tu asistencia en los <b>últimos minutos</b> de la colegiatura, con el código que muestra tu jefe de taller.</p>
+   <label for="cod">Código de la sesión</label>
+   <input id="cod" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false">
+   <label for="dni">Tu DNI</label>
+   <input id="dni" inputmode="numeric" maxlength="8" autocomplete="off">
+   <div id="av" class="m av hidden" role="status"></div>
+   <button id="b1">Continuar</button>
+  </div>
+  <div id="p2" class="hidden">
+   <p style="margin-top:0">Registrarás la asistencia de <b id="nom"></b>.</p>
+   <label for="tema">Tema tratado o tu aporte</label>
+   <textarea id="tema" rows="4" maxlength="500" placeholder="Escribe con tus palabras lo trabajado en la colegiatura"></textarea>
+   <button id="b2">Confirmar y registrar</button>
+   <button id="atras" class="s">No soy yo</button>
+  </div>
+  <div id="p3" class="hidden"><div class="m ok"><b>Asistencia registrada</b><div id="fin"></div></div></div>
+  <div id="msg" class="m hidden" role="alert"></div>
  </div>
- <div id="p2" class="hidden">
-  <p style="margin-top:0">Registrarás la asistencia de <b id="nom"></b><br><small id="det"></small></p>
-  <label for="tema">Tema tratado o tu aporte</label>
-  <textarea id="tema" rows="4" maxlength="500" placeholder="Escribe con tus palabras lo trabajado en la colegiatura"></textarea>
-  <button id="b2">Confirmar y registrar</button><button id="atras" class="s">No soy yo</button>
- </div>
- <div id="p3" class="hidden"><div class="m ok"><b>Asistencia registrada</b><div id="fin"></div></div></div>
- <div id="msg" class="m hidden" role="alert"></div>
-</div></div>
+</div>
 <div class="pie">I.E.E. Pedro E. Paulet - Huacho (MSE-SFT) ::: Área Técnica &nbsp;·&nbsp; Desarrollado por: @hiamet</div>
 <script>
 /* ===== CONFIGURA ESTA LÍNEA: URL de la publicación "Docentes" de Apps Script (termina en /exec) ===== */
-const API='https://script.google.com/macros/s/AKfycbyL9CGu9zwSJY7sqmvOJT1LQ3SfKA5SPNFrWfcux8MeIQ-_1uCwKZdTeO9KaAvvaxPA/exec';
+const API='https://script.google.com/macros/s/AKfycbwiksciB_wGcimrLvMiDbYA2GMuGupON9K1cJrqgk5HHtTcgmW3QitcWSGkWLsbk7bO/exec';
+/* ================================================================================================= */
 const $=id=>document.getElementById(id);
-const Q=(new URLSearchParams(location.search).get('s')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
-if(Q){$('cod').value=Q;$('dni').focus();}
-async function post(o){
-  if(/^PEGA_AQUI/.test(API))throw new Error('config');
-  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)});
-  const t=await r.text();
-  try{return JSON.parse(t);}catch(x){throw new Error('respuesta');}
+let off=0,ven=0,fin=0,vh='',listo=false,hecho=false,ultimo='';
+
+async function llamar(url,opts){
+  if(/^PEGA_AQUI/.test(String(API).trim()))throw new Error('config');
+  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),25000);
+  let txt;
+  try{const r=await fetch(url,Object.assign({signal:ctl.signal},opts||{}));txt=await r.text();}
+  catch(e){throw new Error(e&&e.name==='AbortError'?'tiempo':'red');}
+  finally{clearTimeout(t);}
+  try{return JSON.parse(txt);}catch(x){throw new Error('respuesta');}
 }
-function fallo(e){
-  err(e&&e.message==='config'?'La página aún no tiene configurada la dirección del sistema. Avisa al administrador. (código: A)'
-    :e&&e.message==='respuesta'?'El sistema respondió algo inesperado. Avisa al administrador: debe revisar la publicación de Docentes. (código: B)'
-    :'No se pudo conectar con el sistema. Revisa tu internet; si persiste, avisa al administrador. (código: C)');
+const BASE=()=>String(API).trim();
+const get=p=>llamar(BASE()+(BASE().indexOf('?')<0?'?':'&')+new URLSearchParams(p).toString());
+const post=o=>llamar(BASE(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)});
+function textoFallo(e,marcando){
+  const k=e&&e.message;
+  if(k==='config')return 'La página aún no está configurada. Avisa al administrador. (código A)';
+  if(k==='respuesta')return 'El sistema respondió algo inesperado. Avisa al administrador: debe revisar la publicación "Docentes". (código B)';
+  if(k==='tiempo')return 'El sistema tardó demasiado en responder. Vuelve a intentar. (código D)'+(marcando?' Si ya presionaste "Confirmar", intenta de nuevo: si dice que ya registraste tu asistencia, está listo.':'');
+  return 'No se pudo conectar con el sistema. Revisa tu internet y vuelve a intentar. (código C)'+(marcando?' Si ya presionaste "Confirmar", intenta de nuevo: si dice que ya registraste tu asistencia, está listo.':'');
 }
 function err(t){$('msg').textContent=t;$('msg').classList.toggle('hidden',!t);}
+function aviso(t){$('av').textContent=t;$('av').classList.toggle('hidden',!t);}
+function estadoVentana(){
+  if(!listo||hecho)return true;
+  const n=Date.now()+off;
+  if(n>=fin){aviso('La sesión ya cerró. Si no alcanzaste a registrarte, consulta con tu jefe de taller.');return false;}
+  if(n<ven){aviso('El registro se habilita a las '+vh+' (últimos minutos de la sesión). Vuelve a esta página entonces.');return false;}
+  aviso('');return true;
+}
+function tick(){$('b1').disabled=!estadoVentana();}
+async function cargarInfo(c){
+  if(c===ultimo)return;ultimo=c;listo=false;aviso('');err('');$('sub').textContent='Colegiatura';$('b1').disabled=false;
+  try{
+    const r=await get({accion:'info',c});
+    if(c!==ultimo)return;
+    if(!r.ok){err(r.error);return;}
+    $('sub').textContent='Colegiatura de '+r.jefe+' · Grupo '+r.grupo;
+    off=r.ahora-Date.now();ven=r.ventana;fin=r.fin;vh=r.vHora;listo=true;tick();
+  }catch(e){err(textoFallo(e,false));ultimo='';}
+}
+$('cod').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');if(e.target.value.length===6)cargarInfo(e.target.value);else{ultimo='';listo=false;aviso('');$('b1').disabled=false;}});
 $('dni').addEventListener('input',e=>e.target.value=e.target.value.replace(/\D/g,''));
-$('cod').addEventListener('input',e=>e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,''));
 $('b1').onclick=async()=>{
   err('');const c=$('cod').value.trim(),dni=$('dni').value.trim();
   if(c.length<6)return err('Escribe el código de 6 caracteres que muestra tu jefe de taller.');
   if(!/^\d{8}$/.test(dni))return err('El DNI debe tener 8 dígitos.');
   $('b1').disabled=true;
-  try{const r=await post({accion:'buscar',c,dni});if(!r.ok)err(r.error);else{$('nom').textContent=r.nombre;$('det').textContent='Colegiatura de '+r.jefe+' · Grupo '+r.grupo;$('p1').classList.add('hidden');$('p2').classList.remove('hidden');}}
-  catch(e){fallo(e);}
-  $('b1').disabled=false;
+  try{
+    const r=await post({accion:'buscar',c,dni});
+    if(!r.ok)err(r.error);
+    else{$('nom').textContent=r.nombre;$('sub').textContent='Colegiatura de '+r.jefe+' · Grupo '+r.grupo;$('p1').classList.add('hidden');$('p2').classList.remove('hidden');$('tema').focus();}
+  }catch(e){err(textoFallo(e,false));}
+  if(!listo||estadoVentana())$('b1').disabled=false;
 };
 $('atras').onclick=()=>{err('');$('p2').classList.add('hidden');$('p1').classList.remove('hidden');};
 $('b2').onclick=async()=>{
   err('');$('b2').disabled=true;
-  try{const r=await post({accion:'marcar',c:$('cod').value.trim(),dni:$('dni').value.trim(),tema:$('tema').value});
-    if(!r.ok)err(r.error);else{$('p2').classList.add('hidden');$('p3').classList.remove('hidden');$('fin').textContent=r.nombre+' · '+r.hora;}}
-  catch(e){fallo(e);}
+  try{
+    const r=await post({accion:'marcar',c:$('cod').value.trim(),dni:$('dni').value.trim(),tema:$('tema').value});
+    if(!r.ok)err(r.error);
+    else{hecho=true;$('p2').classList.add('hidden');$('p3').classList.remove('hidden');$('fin').textContent=r.nombre+' · '+r.hora;}
+  }catch(e){err(textoFallo(e,true));}
   $('b2').disabled=false;
 };
-</script></body></html>
+const Q=(new URLSearchParams(location.search).get('s')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+if(Q){$('cod').value=Q;if(Q.length===6){cargarInfo(Q);$('dni').focus();}}
+setInterval(tick,1000);
+</script>
+</body>
+</html>
